@@ -22,4 +22,8 @@
     <ProjectReference Include="..\Store.Infrastructure\Store.Infrastructure.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Controllers\" />
+  </ItemGroup>
+
 </Project>
