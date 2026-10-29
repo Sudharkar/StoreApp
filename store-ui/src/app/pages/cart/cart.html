@@ -1,0 +1,47 @@
+<h2>Your Cart</h2>
+
+@if (placed(); as o) {
+  <div class="success">
+    Order #{{ o.id }} placed. Subtotal ₹{{ o.subTotal }}, discount ₹{{ o.discount }},
+    <b>total ₹{{ o.total }}</b>.
+  </div>
+  <button (click)="goToOrders()">View my orders</button>
+} @else if (cart.items().length === 0) {
+  <div class="empty">
+    Your cart is empty. <a routerLink="/products">Browse products</a>
+  </div>
+} @else {
+  @if (error()) {
+    <div class="alert">{{ error() }}</div>
+  }
+
+  <div class="card table-wrap">
+    <table>
+      <thead>
+        <tr><th>Product</th><th>Price</th><th>Qty</th><th>Total</th><th></th></tr>
+      </thead>
+      <tbody>
+        @for (i of cart.items(); track i.productId) {
+          <tr>
+            <td>{{ i.name }}</td>
+            <td>₹{{ i.price }}</td>
+            <td>
+              <input type="number" class="qty" min="1" [max]="i.maxStock"
+                     [ngModel]="i.quantity" (ngModelChange)="changeQty(i.productId, $event)" />
+            </td>
+            <td>₹{{ i.price * i.quantity }}</td>
+            <td><button class="danger" (click)="remove(i.productId)">Remove</button></td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+
+  <div class="summary">
+    <div>Subtotal: <b>₹{{ cart.subTotal() }}</b></div>
+    <small>Discounts are calculated by the server at checkout.</small>
+    <button [disabled]="placing()" (click)="checkout()">
+      {{ placing() ? 'Placing order...' : 'Place Order' }}
+    </button>
+  </div>
+}
