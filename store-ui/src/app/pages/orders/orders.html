@@ -1,0 +1,40 @@
+<h2>My Orders</h2>
+
+@if (actionError()) {
+  <div class="alert">{{ actionError() }}</div>
+}
+
+@if (loading()) {
+  <div class="empty">Loading orders...</div>
+} @else if (error()) {
+  <div class="alert">{{ error() }} <button class="secondary" (click)="load()">Retry</button></div>
+} @else if (orders().length === 0) {
+  <div class="empty">No orders yet. <a routerLink="/products">Start shopping</a></div>
+} @else {
+  @for (o of orders(); track o.id) {
+    <div class="card order">
+      <div class="head">
+        <b>Order #{{ o.id }}</b>
+        <span [class]="'badge ' + o.status">{{ o.status }}</span>
+        <small>{{ o.createdAt | date: 'medium' }}</small>
+      </div>
+      <ul>
+        @for (i of o.items; track i.productId) {
+          <li>{{ i.productName }} x {{ i.quantity }} @ ₹{{ i.unitPrice }}</li>
+        }
+      </ul>
+      <div>Subtotal ₹{{ o.subTotal }} | Discount ₹{{ o.discount }} | <b>Total ₹{{ o.total }}</b></div>
+      @if (canCancel(o)) {
+        <button class="danger" [disabled]="cancellingId() === o.id" (click)="cancel(o)">
+          {{ cancellingId() === o.id ? 'Cancelling...' : 'Cancel order' }}
+        </button>
+      }
+    </div>
+  }
+
+  <div class="pager">
+    <button class="secondary" [disabled]="page() <= 1" (click)="goTo(page() - 1)">Previous</button>
+    <span>Page {{ page() }} of {{ totalPages() }}</span>
+    <button class="secondary" [disabled]="page() >= totalPages()" (click)="goTo(page() + 1)">Next</button>
+  </div>
+}
