@@ -34,8 +34,12 @@ public class StoreDbContext : DbContext
             e.Property(x => x.Sku).HasMaxLength(50).IsRequired();
             e.Property(x => x.Name).HasMaxLength(200).IsRequired();
             e.Property(x => x.Price).HasPrecision(18, 2);
-            // Rule 2: optimistic concurrency (SQL Server rowversion)
-            e.Property(x => x.RowVersion).IsRowVersion();
+            // SQL Server generates rowversion itself. Other providers (SQLite in unit tests) cannot,
+            // so there it is a plain concurrency token that we set manually.
+            if (Database.ProviderName?.Contains("SqlServer") == true)
+                e.Property(x => x.RowVersion).IsRowVersion();
+            else
+                e.Property(x => x.RowVersion).IsConcurrencyToken().ValueGeneratedNever();
             e.HasIndex(x => x.Sku).IsUnique();
         });
 
