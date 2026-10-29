@@ -11,7 +11,7 @@ namespace Store.Infrastructure.Services;
 
 public class ProductService : IProductService
 {
-    private const string CacheVersionKey = "products:version";
+    public const string CacheVersionKey = "products:version";
 
     private readonly StoreDbContext _db;
     private readonly IMemoryCache _cache;
