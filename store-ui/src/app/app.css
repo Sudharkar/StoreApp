@@ -1,0 +1,5 @@
+.nav { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; background: #111827; padding: 10px 16px; }
+.nav a { color: #e5e7eb; margin-right: 12px; }
+.nav .brand { font-weight: bold; font-size: 18px; color: #fff; }
+.links { display: flex; align-items: center; flex-wrap: wrap; gap: 4px; }
+.who { color: #9ca3af; margin: 0 8px; font-size: 14px; }

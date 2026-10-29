@@ -1,0 +1,21 @@
+<div class="auth-card">
+  <h2>Login</h2>
+
+  @if (error()) {
+    <div class="alert">{{ error() }}</div>
+  }
+
+  <form (ngSubmit)="submit()">
+    <label>Email
+      <input type="email" name="email" [(ngModel)]="email" required />
+    </label>
+    <label>Password
+      <input type="password" name="password" [(ngModel)]="password" required />
+    </label>
+    <button type="submit" [disabled]="loading() || !email || !password">
+      {{ loading() ? 'Logging in...' : 'Login' }}
+    </button>
+  </form>
+
+  <p>New here? <a routerLink="/register">Create an account</a></p>
+</div>
