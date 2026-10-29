@@ -1,0 +1,65 @@
+<h2>Products</h2>
+
+<div class="card filters">
+  <div class="row">
+    <label>Search
+      <input [ngModel]="name" (ngModelChange)="onSearch($event)" placeholder="Name or SKU" />
+    </label>
+    <label>Min price
+      <input type="number" [(ngModel)]="minPrice" (change)="applyFilters()" min="0" />
+    </label>
+    <label>Max price
+      <input type="number" [(ngModel)]="maxPrice" (change)="applyFilters()" min="0" />
+    </label>
+    <label>Sort by
+      <select [(ngModel)]="sortBy" (change)="applyFilters()">
+        <option value="name">Name</option>
+        <option value="price">Price</option>
+        <option value="stock">Stock</option>
+        <option value="newest">Newest</option>
+      </select>
+    </label>
+    <label class="check">
+      <input type="checkbox" [(ngModel)]="desc" (change)="applyFilters()" /> Descending
+    </label>
+    <label class="check">
+      <input type="checkbox" [(ngModel)]="inStock" (change)="applyFilters()" /> In stock only
+    </label>
+    <button class="secondary" (click)="clearFilters()">Clear</button>
+  </div>
+</div>
+
+@if (added()) {
+  <div class="success">{{ added() }}</div>
+}
+
+@if (loading()) {
+  <div class="empty">Loading products...</div>
+} @else if (error()) {
+  <div class="alert">{{ error() }} <button class="secondary" (click)="applyFilters()">Retry</button></div>
+} @else if (products().length === 0) {
+  <div class="empty">No products found. Try changing the filters.</div>
+} @else {
+  <div class="grid">
+    @for (p of products(); track p.id) {
+      <div class="card product">
+        <h3>{{ p.name }}</h3>
+        <div class="sku">{{ p.sku }}</div>
+        <div class="price">₹{{ p.price }}</div>
+        @if (p.stockQuantity > 0) {
+          <div class="stock">In stock: {{ p.stockQuantity }}</div>
+          <button (click)="addToCart(p)">Add to cart</button>
+        } @else {
+          <div class="out">Out of stock</div>
+          <button disabled>Add to cart</button>
+        }
+      </div>
+    }
+  </div>
+
+  <div class="pager">
+    <button class="secondary" [disabled]="page <= 1" (click)="goToPage(page - 1)">Previous</button>
+    <span>Page {{ page }} of {{ totalPages() }} ({{ totalCount() }} items)</span>
+    <button class="secondary" [disabled]="page >= totalPages()" (click)="goToPage(page + 1)">Next</button>
+  </div>
+}
