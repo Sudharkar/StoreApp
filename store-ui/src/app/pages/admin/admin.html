@@ -1,0 +1,131 @@
+<h2>Admin</h2>
+
+<div class="tabs">
+  <button [class.secondary]="tab() !== 'products'" (click)="setTab('products')">Products</button>
+  <button [class.secondary]="tab() !== 'orders'" (click)="setTab('orders')">Orders</button>
+  <button [class.secondary]="tab() !== 'report'" (click)="setTab('report')">Top customers</button>
+</div>
+
+@if (error()) { <div class="alert">{{ error() }}</div> }
+@if (message()) { <div class="success">{{ message() }}</div> }
+
+@if (tab() === 'products') {
+  <div class="card">
+    <h3>{{ editingId ? 'Edit product' : 'New product' }}</h3>
+    <form (ngSubmit)="saveProduct()">
+      <div class="row">
+        <label>SKU
+          <input name="sku" [(ngModel)]="form.sku" [disabled]="editingId !== null" required />
+        </label>
+        <label>Name
+          <input name="name" [(ngModel)]="form.name" required />
+        </label>
+        <label>Price
+          <input type="number" name="price" [(ngModel)]="form.price" min="0.01" step="0.01" required />
+        </label>
+        <label>Stock
+          <input type="number" name="stock" [(ngModel)]="form.stockQuantity" min="0" required />
+        </label>
+        <label class="check">
+          <input type="checkbox" name="active" [(ngModel)]="form.isActive" /> Active
+        </label>
+      </div>
+      <button type="submit" [disabled]="!form.name || !form.sku || form.price <= 0">
+        {{ editingId ? 'Update' : 'Create' }}
+      </button>
+      @if (editingId) { <button type="button" class="secondary" (click)="resetForm()">Cancel</button> }
+    </form>
+  </div>
+
+  @if (loading()) {
+    <div class="empty">Loading...</div>
+  } @else if (products().length === 0) {
+    <div class="empty">No products.</div>
+  } @else {
+    <div class="card table-wrap">
+      <table>
+        <thead><tr><th>SKU</th><th>Name</th><th>Price</th><th>Stock</th><th>Active</th><th></th></tr></thead>
+        <tbody>
+          @for (p of products(); track p.id) {
+            <tr>
+              <td>{{ p.sku }}</td><td>{{ p.name }}</td><td>₹{{ p.price }}</td>
+              <td>{{ p.stockQuantity }}</td><td>{{ p.isActive ? 'Yes' : 'No' }}</td>
+              <td><button class="secondary" (click)="edit(p)">Edit</button></td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+    <div class="pager">
+      <button class="secondary" [disabled]="productPage() <= 1" (click)="goProducts(productPage() - 1)">Previous</button>
+      <span>Page {{ productPage() }} of {{ productPages() }}</span>
+      <button class="secondary" [disabled]="productPage() >= productPages()" (click)="goProducts(productPage() + 1)">Next</button>
+    </div>
+  }
+}
+
+@if (tab() === 'orders') {
+  @if (loading()) {
+    <div class="empty">Loading...</div>
+  } @else if (orders().length === 0) {
+    <div class="empty">No orders yet.</div>
+  } @else {
+    <div class="card table-wrap">
+      <table>
+        <thead><tr><th>#</th><th>Customer</th><th>Date</th><th>Total</th><th>Status</th></tr></thead>
+        <tbody>
+          @for (o of orders(); track o.id) {
+            <tr>
+              <td>{{ o.id }}</td>
+              <td>{{ o.customerName }}</td>
+              <td>{{ o.createdAt | date: 'short' }}</td>
+              <td>₹{{ o.total }}</td>
+              <td>
+                <select [ngModel]="o.status" (ngModelChange)="changeStatus(o, $event)">
+                  @for (s of statuses; track s) { <option [value]="s">{{ s }}</option> }
+                </select>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+    <div class="pager">
+      <button class="secondary" [disabled]="orderPage() <= 1" (click)="goOrders(orderPage() - 1)">Previous</button>
+      <span>Page {{ orderPage() }} of {{ orderPages() }}</span>
+      <button class="secondary" [disabled]="orderPage() >= orderPages()" (click)="goOrders(orderPage() + 1)">Next</button>
+    </div>
+  }
+}
+
+@if (tab() === 'report') {
+  <div class="card">
+    <div class="row">
+      <label>Last N days
+        <input type="number" [(ngModel)]="days" min="1" />
+      </label>
+      <button (click)="loadReport()">Load</button>
+    </div>
+  </div>
+
+  @if (loading()) {
+    <div class="empty">Loading...</div>
+  } @else if (top().length === 0) {
+    <div class="empty">No Confirmed/Shipped orders in this period.</div>
+  } @else {
+    <div class="card table-wrap">
+      <table>
+        <thead><tr><th>Customer</th><th>Email</th><th>Orders</th><th>Total spend</th><th></th></tr></thead>
+        <tbody>
+          @for (t of top(); track t.customerId) {
+            <tr>
+              <td>{{ t.fullName }}</td><td>{{ t.email }}</td><td>{{ t.orderCount }}</td>
+              <td>₹{{ t.totalSpend }}</td>
+              <td class="barcell"><div class="bar" [style.width.%]="(t.totalSpend / maxSpend()) * 100"></div></td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+}

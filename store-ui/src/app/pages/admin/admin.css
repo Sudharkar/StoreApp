@@ -1,0 +1,7 @@
+.tabs { display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; }
+.card { margin-bottom: 12px; }
+.check { display: flex; align-items: center; gap: 6px; flex: 0 0 auto; }
+.check input { width: auto; margin: 0; }
+.pager { display: flex; justify-content: center; align-items: center; gap: 12px; margin-top: 12px; }
+.barcell { width: 30%; }
+.bar { height: 12px; background: #2563eb; border-radius: 6px; }
